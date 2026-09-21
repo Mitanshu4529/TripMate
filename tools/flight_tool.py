@@ -13,9 +13,8 @@ os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
 API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
 
-# Default origin when user says only destination, e.g. "Japan trip"
-# Change this if your default location is not Bangladesh/Dhaka.
-DEFAULT_ORIGIN_IATA = os.getenv("DEFAULT_ORIGIN_IATA", "DAC")
+# Default origin when user provides only destination (e.g. "Goa trip" or "Japan trip")
+DEFAULT_ORIGIN_IATA = os.getenv("DEFAULT_ORIGIN_IATA", "DEL")
 
 
 BASE_URL = "https://api.aviationstack.com/v1/flights"
@@ -536,6 +535,6 @@ def search_flights(query: str, limit: int = 10):
 
 
 if __name__ == "__main__":
-    print(search_flights("Plan a 7 days Japan trip from Bangladesh"))
+    print(search_flights("Plan a 5 days Goa trip from Delhi"))
     print("\n" + "=" * 80 + "\n")
     print(search_flights("all country flight info"))
