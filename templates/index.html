@@ -2,128 +2,214 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripMate AI — Autonomous Multi-Agent Travel Planner</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <title>TripMate AI</title>
-
-    <link rel="stylesheet" href="/static/style.css">
+    <!-- CSS (with cache buster) -->
+    <link rel="stylesheet" href="/static/style.css?v=3.5">
 </head>
 
 <body>
 
-    <div class="page-bg">
-        <div class="gradient-circle circle-1"></div>
-        <div class="gradient-circle circle-2"></div>
-        <div class="gradient-circle circle-3"></div>
+    <!-- Ambient Glowing Background Orbs -->
+    <div class="ambient-bg">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+        <div class="grid-overlay"></div>
     </div>
 
-    <main class="app-container">
-
-        <section class="hero-section">
-            <div class="badge">
-                ✈️ TripMate AI — A Multi-Agent Travel Planner with LangGraph
+    <!-- Main Container -->
+    <div class="main-wrapper">
+        
+        <!-- Navigation Header -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">✈️</span>
+                <span class="brand-name">TripMate <span class="gradient-brand">AI</span></span>
             </div>
 
-            <h1>
-                Plan Your Perfect Trip with AI
+            <div class="nav-status">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>Multi-Agent System Online</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-chip">
+                <span class="chip-sparkle">✨</span> Built on LangGraph Multi-Agent Architecture
+            </div>
+
+            <h1 class="hero-heading">
+                Where to next? <br>
+                <span class="hero-gradient">Let AI architect your journey.</span>
             </h1>
 
-            <p>
-                Search flights, discover hotels, and generate a complete travel itinerary using a multi-agent LangGraph system.
+            <p class="hero-desc">
+                Search live flights, discover curated stays, and generate customized day-by-day itineraries tailored to your budget in seconds.
             </p>
         </section>
 
-        <section class="planner-card">
-
-            <div class="card-header">
-                <div>
-                    <h2>Where do you want to go?</h2>
-                    <p>
-                        Example: Plan a 7 days trip from Delhi to Goa for 3 people under 30k.
-                    </p>
+        <!-- Integrated Search Console Box -->
+        <section class="search-section">
+            <div class="search-box">
+                
+                <!-- Agent Badges Top Row -->
+                <div class="search-box-header">
+                    <div class="agent-pills-list">
+                        <span class="agent-pill"><span class="pill-emoji">🛫</span> Flights</span>
+                        <span class="agent-pill"><span class="pill-emoji">🏨</span> Hotels</span>
+                        <span class="agent-pill"><span class="pill-emoji">📅</span> Itinerary</span>
+                        <span class="agent-pill"><span class="pill-emoji">💰</span> Budget</span>
+                    </div>
                 </div>
 
-                <div class="status-pill">
-                    <span class="status-dot"></span>
-                    Online
+                <!-- Textarea -->
+                <div class="textarea-container">
+                    <textarea
+                        id="userInput"
+                        rows="3"
+                        placeholder="e.g. Plan a 7 days trip from Delhi to Goa for 3 friends with beachfront stays and sightseeing under ₹30,000..."
+                    ></textarea>
+                </div>
+
+                <!-- Search Box Footer Actions -->
+                <div class="search-box-footer">
+                    <div class="hint-text">
+                        <span>Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to generate</span>
+                    </div>
+
+                    <div class="btn-group">
+                        <button id="clearBtn" class="btn-secondary" onclick="clearInput()" type="button">
+                            Clear
+                        </button>
+                        <button id="sendBtn" class="btn-primary" onclick="sendMessage()" type="button">
+                            <span id="btnText" class="btn-text-wrapper">
+                                <span>✨</span> Generate Plan
+                            </span>
+                            <span id="btnLoader" class="spinner-loader hidden"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="input-area">
-                <textarea
-                    id="userInput"
-                    placeholder="Plan a complete 7 days trip from Delhi to Goa including flights, stays, sightseeing and budget..."
-                ></textarea>
-
-                <button id="sendBtn" onclick="sendMessage()">
-                    <span id="btnText">Generate Plan</span>
-                    <span id="btnLoader" class="loader hidden"></span>
-                </button>
-            </div>
-
-            <div class="quick-prompts">
-                <button onclick="setPrompt('Plan a complete 7 days Goa trip from Delhi for 3 people under 30k with hotels and sightseeing.')">
-                    Goa Trip
-                </button>
-
-                <button onclick="setPrompt('Plan a 5 days Dubai trip from Mumbai with flights, top attractions and hotel stays.')">
-                    Dubai Trip
-                </button>
-
-                <button onclick="setPrompt('Plan a 7 days Japan trip from Delhi with cultural spots, bullet train, and budget hotels.')">
-                    Japan Trip
-                </button>
-
-                <button onclick="setPrompt('Plan a 4 days Manali weekend trip with scenic spots and itinerary.')">
-                    Manali Trip
-                </button>
-            </div>
-
-        </section>
-
-        <section id="resultSection" class="result-section hidden">
-
-            <div class="result-header">
-                <div>
-                    <h2>Your AI Travel Plan</h2>
-                    <p id="threadInfo">Thread ID: -</p>
-                </div>
-
-                <div class="result-actions">
-                    <button class="copy-btn" onclick="copyResult()">
-                        Copy
+            <!-- Suggestion Chips Row -->
+            <div class="suggestions-wrapper">
+                <span class="suggestions-title">Quick Ideas:</span>
+                <div class="chips-container">
+                    <button class="chip" onclick="setPrompt('Plan a complete 7 days Goa trip from Delhi for 3 people under ₹30k with beach resorts and water sports.')">
+                        🏖️ Goa Beach Getaway
                     </button>
-
-                    <button class="download-btn" onclick="downloadPDF()">
-                        Download PDF
+                    <button class="chip" onclick="setPrompt('Plan a 5 days Dubai trip from Mumbai with Burj Khalifa, desert safari, and top hotel stays.')">
+                        🏙️ Dubai Highlights
+                    </button>
+                    <button class="chip" onclick="setPrompt('Plan a 7 days Japan trip from Delhi covering Tokyo, Kyoto, bullet train, and sightseeing.')">
+                        ⛩️ Japan Discovery
+                    </button>
+                    <button class="chip" onclick="setPrompt('Plan a 4 days Manali road trip from Delhi with mountain cafes, trekking, and sightseeing.')">
+                        🏔️ Manali Road Trip
                     </button>
                 </div>
             </div>
-
-            <div id="pdfContent" class="pdf-content">
-                <h1 class="pdf-title">AI Travel Plan</h1>
-                <div id="resultBox" class="result-box"></div>
-            </div>
-
         </section>
 
-        <section id="errorBox" class="error-box hidden"></section>
+        <!-- Live Multi-Agent Coordination Stepper -->
+        <section id="agentProgressSection" class="progress-section hidden">
+            <div class="progress-box">
+                <div class="progress-head">
+                    <div class="pulse-spinner"></div>
+                    <div>
+                        <h3 id="progressTitle">Coordinating Agents...</h3>
+                        <p id="progressSubtitle">LangGraph multi-agent pipeline is orchestrating your travel request</p>
+                    </div>
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-card" id="stepFlight">
+                        <span class="agent-icon">🛫</span>
+                        <div class="agent-info">
+                            <strong>Flight Agent</strong>
+                            <small>Resolving routes & schedules</small>
+                        </div>
+                    </div>
+                    <div class="agent-card" id="stepHotel">
+                        <span class="agent-icon">🏨</span>
+                        <div class="agent-info">
+                            <strong>Hotel Agent</strong>
+                            <small>Discovering top accommodations</small>
+                        </div>
+                    </div>
+                    <div class="agent-card" id="stepItinerary">
+                        <span class="agent-icon">📅</span>
+                        <div class="agent-info">
+                            <strong>Itinerary Agent</strong>
+                            <small>Structuring daily schedules</small>
+                        </div>
+                    </div>
+                    <div class="agent-card" id="stepFinal">
+                        <span class="agent-icon">✨</span>
+                        <div class="agent-info">
+                            <strong>Final Synthesizer</strong>
+                            <small>Creating polished blueprint</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    </main>
+        <!-- Error Banner -->
+        <section id="errorBox" class="error-card hidden"></section>
 
-    <footer>
-        Built with FastAPI, LangGraph, Groq, PostgreSQL, Tavily and AviationStack
-    </footer>
+        <!-- Results Section -->
+        <section id="resultSection" class="results-section hidden">
+            <div class="plan-card">
+                <div class="plan-card-header">
+                    <div class="plan-title-block">
+                        <span class="plan-badge">GENERATED BLUEPRINT</span>
+                        <h2>Your Customized Travel Plan</h2>
+                        <span id="threadInfo" class="thread-info">Thread: -</span>
+                    </div>
 
-    <!-- Markdown Renderer -->
+                    <div class="plan-actions">
+                        <button id="copyBtn" class="action-button" onclick="copyResult()" title="Copy Markdown">
+                            <span>📋</span> Copy Plan
+                        </button>
+                        <button id="downloadBtn" class="action-button highlight-action" onclick="downloadPDF()" title="Export PDF">
+                            <span>📄</span> Export PDF
+                        </button>
+                        <button id="newSearchBtn" class="action-button" onclick="resetSearch()" title="New Query">
+                            <span>🔄</span> New Plan
+                        </button>
+                    </div>
+                </div>
+
+                <div id="pdfContent" class="pdf-container">
+                    <div id="resultBox" class="markdown-body"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p><strong>TripMate AI</strong> — Multi-Agent Autonomous Travel Intelligence Platform</p>
+            <p class="footer-tags">Powered by LangGraph • FastAPI • Groq & Ollama • PostgreSQL Checkpointer • Tavily AI • AviationStack</p>
+        </footer>
+
+    </div>
+
+    <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <!-- PDF Download Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <!-- Your Custom JS -->
-    <script src="/static/script.js"></script>
+    
+    <!-- App Logic -->
+    <script src="/static/script.js?v=3.5"></script>
 
 </body>
 </html>
