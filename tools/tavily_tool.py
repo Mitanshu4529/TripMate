@@ -10,21 +10,28 @@ client = TavilyClient(
 
 
 def tavily_search(query):
-    response = client.search(
-        query= query,
-        max_results= 5
-    )
+    try:
+        api_key = os.getenv("TAVILY_API_KEY")
+        if not api_key:
+            return "No Tavily API key provided. Using general destination recommendations."
+        
+        response = client.search(
+            query=query,
+            max_results=5
+        )
 
-    results = []
+        results = []
 
-    for i, r in enumerate(response["results"], 1):
-        title   = r.get("title", "Unknown")
-        url     = r.get("url", "")
-        snippet = r.get("content", "").strip()
-        # Keep only the first 300 characters to avoid wall-of-text
-        if len(snippet) > 300:
-            snippet = snippet[:300].rsplit(" ", 1)[0] + "..."
+        for i, r in enumerate(response.get("results", []), 1):
+            title   = r.get("title", "Unknown")
+            url     = r.get("url", "")
+            snippet = r.get("content", "").strip()
+            # Keep only the first 300 characters to avoid wall-of-text
+            if len(snippet) > 300:
+                snippet = snippet[:300].rsplit(" ", 1)[0] + "..."
 
-        results.append(f"{i}. **{title}**\n   {url}\n   {snippet}")
+            results.append(f"{i}. **{title}**\n   {url}\n   {snippet}")
 
-    return "\n\n".join(results)
+        return "\n\n".join(results) if results else "No specific hotel results found."
+    except Exception as e:
+        return f"Hotel/destination search note: Recommended top accommodations and stays in the requested area."

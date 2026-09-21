@@ -16,6 +16,7 @@ from psycopg.rows import dict_row
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.postgres import PostgresSaver
+from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import (
     AnyMessage,
     HumanMessage,
@@ -23,6 +24,7 @@ from langchain_core.messages import (
     SystemMessage,
 )
 from langchain_groq import ChatGroq
+from langchain_ollama import ChatOllama
 from tools.tavily_tool import tavily_search
 from tools.flight_tool import search_flights
 
@@ -31,9 +33,7 @@ def get_database_url():
     database_url = os.getenv("DATABASE_URL")
 
     if not database_url:
-        raise ValueError(
-            "DATABASE_URL is missing. Please add your Render PostgreSQL External Database URL to .env"
-        )
+        return None
 
     if "sslmode=" not in database_url:
         separator = "&" if "?" in database_url else "?"
@@ -42,19 +42,28 @@ def get_database_url():
     return database_url
 
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file.")
-
-
 # =========================
-# LLM
+# LLM Initialization
 # =========================
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
-llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
-    api_key=GROQ_API_KEY
-)
+if LLM_PROVIDER == "groq" and os.getenv("GROQ_API_KEY"):
+    groq_model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+    llm = ChatGroq(
+        model=groq_model,
+        api_key=os.getenv("GROQ_API_KEY")
+    )
+    print(f"Using Groq LLM: {groq_model}")
+else:
+    num_gpu = int(os.getenv("OLLAMA_NUM_GPU", "0"))
+    llm = ChatOllama(
+        model=OLLAMA_MODEL,
+        base_url=OLLAMA_BASE_URL,
+        num_gpu=num_gpu
+    )
+    print(f"Using Local Ollama LLM: {OLLAMA_MODEL} (num_gpu={num_gpu})")
 
 
 # =========================
@@ -205,18 +214,27 @@ graph.add_edge("final_agent", END)
 
 
 # =========================
-# PostgreSQL Checkpointer
+# Checkpointer
 # =========================
+checkpointer = None
 DATABASE_URL = get_database_url()
 
-_conn = psycopg.connect(
-    DATABASE_URL,
-    autocommit=True,
-    row_factory=dict_row
-)
-
-checkpointer = PostgresSaver(_conn)
-checkpointer.setup()
+if DATABASE_URL:
+    try:
+        _conn = psycopg.connect(
+            DATABASE_URL,
+            autocommit=True,
+            row_factory=dict_row
+        )
+        checkpointer = PostgresSaver(_conn)
+        checkpointer.setup()
+        print("Connected to PostgreSQL checkpointer.")
+    except Exception as e:
+        print(f"PostgreSQL connection failed ({e}). Falling back to in-memory checkpointer.")
+        checkpointer = MemorySaver()
+else:
+    print("No DATABASE_URL provided. Using in-memory checkpointer.")
+    checkpointer = MemorySaver()
 
 travel_graph = graph.compile(checkpointer=checkpointer)
 
